@@ -1,78 +1,34 @@
 import { recipes as rawData } from './../../data/recipes.js';
 import RecipeFactory from '../factories/RecipesFactory.js';
 
-let data = [];
+let recipeFactory;
 
 function init() {
     try {
-        const recipeFactory = new RecipeFactory();
+        recipeFactory = new RecipeFactory();
+        recipeFactory.loadRecipes(rawData);
+        recipeFactory.displayRecipes(recipeFactory.recipes);  // Ajoutez cette ligne ici
+        recipeFactory.displayTags(recipeFactory.recipes);
 
-        data = rawData.map(d => recipeFactory.create(d));
-
-        console.log("Created recipe objects:", data);
+        console.log("Created recipe objects:", recipeFactory.recipes);
     } catch (error) {
         console.error("Error during initialization:", error);
     }
 
     const searchbar = document.getElementById('searchbar');
 
-    searchbar.addEventListener('input', function() {
+    searchbar.addEventListener('input', function () {
         const query = searchbar.value.trim().toLowerCase();
         if (query.length >= 3) {
-            searchAndDisplayRecipes(query);
+            const filteredRecipes = recipeFactory.searchRecipes(query);
+            recipeFactory.displayRecipes(filteredRecipes);
+            recipeFactory.displayTags(filteredRecipes);
         } else {
-            clearRecipes();
+            recipeFactory.displayRecipes(recipeFactory.recipes);
+            recipeFactory.displayTags(recipeFactory.recipes);
         }
     });
 }
 
-function searchAndDisplayRecipes(query) {
-    const filteredRecipes = data.filter(recipe => {
-        const lowerCaseName = recipe.name ? recipe.name.toLowerCase() : '';
-        const lowerCaseDescription = recipe.description ? recipe.description.toLowerCase() : '';
-
-        return (
-            lowerCaseName.includes(query) ||
-            lowerCaseDescription.includes(query) ||
-            (Array.isArray(recipe.ingredients) && recipe.ingredients.some(item => {
-                return item.ingredient.toLowerCase().includes(query);
-            }))
-        );
-    });
-
-    displayRecipes(filteredRecipes);
-}
-
-function displayRecipes(recipes) {
-    const recipesDiv = document.getElementById('recipes');
-    recipesDiv.innerHTML = '';
-
-    recipes.forEach(recipe => {
-        const recipeElement = document.createElement('div');
-
-        const nameElement = document.createElement('h3');
-        nameElement.textContent = recipe.name;
-        recipeElement.appendChild(nameElement);
-
-        const ingredientsElement = document.createElement('ul');
-        recipe.ingredients.forEach(ingredient => {
-            const li = document.createElement('li');
-            li.textContent = `${ingredient.ingredient} ${ingredient.quantity || ''} ${ingredient.unit || ''}`.trim();
-            ingredientsElement.appendChild(li);
-        });
-        recipeElement.appendChild(ingredientsElement);
-
-        const descriptionElement = document.createElement('p');
-        descriptionElement.textContent = `Description: ${recipe.description}`;
-        recipeElement.appendChild(descriptionElement);
-
-        recipesDiv.appendChild(recipeElement);
-    });
-}
-
-function clearRecipes() {
-    const recipesDiv = document.getElementById('recipes');
-    recipesDiv.innerHTML = '';
-}
-
 init();
+

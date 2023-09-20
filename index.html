@@ -17,6 +17,24 @@
             <input id="searchbar" name="searchbar" type="text" placeholder="Rechercher une recette">
             <i id="searchicon" class="fa-solid fa-magnifying-glass"></i>
         </div>
+        <div id="filters">
+            <div id="selected-tags">
+                <h2>Tags sélectionnés :</h2>
+                <div id="selected-tags-container"></div>
+            </div>
+            <div id="ingredient-tags" class="dropdown">
+                <button class="dropbtn">Ingrédients</button>
+                <div class="dropdown-content" id="ingredient-tags-container"></div>
+            </div>
+            <div id="utensil-tags" class="dropdown">
+                <button class="dropbtn">Ustensiles</button>
+                <div class="dropdown-content" id="utensil-tags-container"></div>
+            </div>
+            <div id="appliance-tags" class="dropdown">
+                <button class="dropbtn">Appareils</button>
+                <div class="dropdown-content" id="appliance-tags-container"></div>
+            </div>
+        </div>
     </header>
     <main id="recipes"></main>
     <p id="errorDiv"></p>

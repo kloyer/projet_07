@@ -39,29 +39,31 @@ export default class RecipesFactory {
     displayRecipes(recipes) {
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
-
-        recipes.forEach(recipe => {
+    
+        for (let i = 0; i < recipes.length; i++) {
+            const recipe = recipes[i];
             const recipeElement = document.createElement('div');
-
+    
             const nameElement = document.createElement('h3');
             nameElement.textContent = recipe.name;
             recipeElement.appendChild(nameElement);
-
+    
             const ingredientsElement = document.createElement('ul');
-            recipe.ingredients.forEach(ingredient => {
+            for (let j = 0; j < recipe.ingredients.length; j++) {
+                const ingredient = recipe.ingredients[j];
                 const li = document.createElement('li');
                 li.textContent = `${ingredient.ingredient} ${ingredient.quantity || ''} ${ingredient.unit || ''}`.trim();
                 ingredientsElement.appendChild(li);
-            });
+            }
             recipeElement.appendChild(ingredientsElement);
-
+    
             const descriptionElement = document.createElement('p');
             descriptionElement.textContent = `Description: ${recipe.description}`;
             recipeElement.appendChild(descriptionElement);
-
+    
             recipesDiv.appendChild(recipeElement);
-        });
-    }
+        }
+    }    
 
     getUniqueTags(recipes, field) {
         const tags = new Set();

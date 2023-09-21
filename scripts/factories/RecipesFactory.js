@@ -37,7 +37,6 @@ export default class RecipesFactory {
     }
 
     displayRecipes(recipes) {
-        console.log(recipes);
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
 

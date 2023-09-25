@@ -36,32 +36,63 @@ export default class RecipesFactory {
         });
     }
 
+    searchAndUpdate(query) {
+        const selectedTagsContainer = document.getElementById('selected-tags-container');
+        const selectedTags = Array.from(selectedTagsContainer.children).map(span => span.textContent);
+    
+        let filteredRecipes;
+        
+        if (query.length >= 3) {
+            filteredRecipes = this.searchRecipes(query);
+            filteredRecipes = this.searchRecipesWithTags(filteredRecipes, selectedTags);
+        } else {
+            filteredRecipes = this.searchRecipesWithTags(this.recipes, selectedTags);
+        }
+        
+        this.displayRecipes(filteredRecipes);
+        this.displayTags(filteredRecipes);
+    }    
+
     displayRecipes(recipes) {
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
-
-        recipes.forEach(recipe => {
+        
+        recipes.filter(recipe => {
             const recipeElement = document.createElement('div');
-
+            recipeElement.classList.add('recipe-item');
+        
+            const imageElement = document.createElement('img');
+            imageElement.src = `assets/recipes/${recipe.image}`;
+            imageElement.alt = `Image de ${recipe.name}`;
+            imageElement.classList.add('recipe-image');
+            recipeElement.appendChild(imageElement);
+        
             const nameElement = document.createElement('h3');
             nameElement.textContent = recipe.name;
+            nameElement.classList.add('recipe-title');
             recipeElement.appendChild(nameElement);
-
+        
             const ingredientsElement = document.createElement('ul');
+            ingredientsElement.classList.add('ingredients-list');
             recipe.ingredients.forEach(ingredient => {
                 const li = document.createElement('li');
+                li.classList.add('ingredient-item');
                 li.textContent = `${ingredient.ingredient} ${ingredient.quantity || ''} ${ingredient.unit || ''}`.trim();
                 ingredientsElement.appendChild(li);
             });
             recipeElement.appendChild(ingredientsElement);
-
+        
             const descriptionElement = document.createElement('p');
+            descriptionElement.classList.add('recipe-description');
             descriptionElement.textContent = `Description: ${recipe.description}`;
             recipeElement.appendChild(descriptionElement);
-
+        
             recipesDiv.appendChild(recipeElement);
+
+            return true;
         });
-    }
+    }    
+       
 
     getUniqueTags(recipes, field) {
         const tags = new Set();
@@ -124,23 +155,25 @@ export default class RecipesFactory {
         tags.forEach(tag => {
             const span = document.createElement('span');
             span.textContent = tag;
-            span.classList.add('tag');
+            span.classList.add('tag', 'recipe-tag');
             span.addEventListener('click', () => this.selectTag(tag, containerId));
             container.appendChild(span);
         });
-    }
+    }    
     
     selectTag(tag, containerId) {
         const selectedTagsContainer = document.getElementById('selected-tags-container');
         const span = document.createElement('span');
         span.textContent = tag;
-        span.classList.add('tag');
+        span.classList.add('tag', 'selected-recipe-tag');
         span.addEventListener('click', () => {
             selectedTagsContainer.removeChild(span);
-            this.searchRecipesWithSelectedTags();
+            const currentSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
+            this.searchAndUpdate(currentSearchQuery);
         });
         selectedTagsContainer.appendChild(span);
-        this.searchRecipesWithSelectedTags();
+        const currentSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
+        this.searchAndUpdate(currentSearchQuery);
     }
     
     searchRecipesWithSelectedTags() {
@@ -151,9 +184,9 @@ export default class RecipesFactory {
         this.displayRecipes(filteredRecipes); 
         this.displayTags(filteredRecipes); 
     }
-    
-    searchRecipesWithTags(tags) {
-        return this.recipes.filter(recipe => 
+
+    searchRecipesWithTags(recipes, tags) {
+        return recipes.filter(recipe => 
             tags.every(tag => 
                 (recipe.ingredients?.map(item => item.ingredient.toLowerCase()) ?? []).includes(tag.toLowerCase()) ||
                 (recipe.ustensils?.map(utensil => utensil.toLowerCase()) ?? []).includes(tag.toLowerCase()) ||

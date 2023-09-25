@@ -19,15 +19,8 @@ function init() {
 
     searchbar.addEventListener('input', function () {
         const query = searchbar.value.trim().toLowerCase();
-        if (query.length >= 3) {
-            const filteredRecipes = recipeFactory.searchRecipes(query);
-            recipeFactory.displayRecipes(filteredRecipes);
-            recipeFactory.displayTags(filteredRecipes);
-        } else {
-            recipeFactory.displayRecipes(recipeFactory.recipes);
-            recipeFactory.displayTags(recipeFactory.recipes);
-        }
-    });
+        recipeFactory.searchAndUpdate(query);
+    });    
 }
 
 init();

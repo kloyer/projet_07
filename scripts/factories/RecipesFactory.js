@@ -57,7 +57,7 @@ export default class RecipesFactory {
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
         
-        recipes.filter(recipe => {
+        recipes.forEach(recipe => {
             const recipeElement = document.createElement('div');
             recipeElement.classList.add('recipe-item');
         
@@ -67,39 +67,73 @@ export default class RecipesFactory {
             imageElement.classList.add('recipe-image');
             recipeElement.appendChild(imageElement);
         
+            // Conteneur pour le contenu sous l'image
+            const contentContainer = document.createElement('div');
+            contentContainer.classList.add('recipe-content');
+            
             const nameElement = document.createElement('h3');
             nameElement.textContent = recipe.name;
             nameElement.classList.add('recipe-title');
-            recipeElement.appendChild(nameElement);
-        
+            contentContainer.appendChild(nameElement);
+    
+            // Sous-titre "Recette"
+            const recipeSubtitle = document.createElement('h4');
+            recipeSubtitle.textContent = "Recette";
+            recipeSubtitle.classList.add('recipe-subtitle');
+            contentContainer.appendChild(recipeSubtitle);
+    
+            const descriptionElement = document.createElement('p');
+            descriptionElement.classList.add('recipe-description');
+            descriptionElement.textContent = recipe.description;
+            contentContainer.appendChild(descriptionElement);
+    
+            // Sous-titre "Ingrédient"
+            const ingredientSubtitle = document.createElement('h4');
+            ingredientSubtitle.textContent = "Ingrédients";
+            ingredientSubtitle.classList.add('ingredient-subtitle');
+            contentContainer.appendChild(ingredientSubtitle);
+    
             const ingredientsElement = document.createElement('ul');
             ingredientsElement.classList.add('ingredients-list');
             recipe.ingredients.forEach(ingredient => {
                 const li = document.createElement('li');
                 li.classList.add('ingredient-item');
-                li.textContent = `${ingredient.ingredient} ${ingredient.quantity || ''} ${ingredient.unit || ''}`.trim();
+    
+                // Nom de l'ingrédient
+                const ingredientName = document.createElement('div');
+                ingredientName.textContent = ingredient.ingredient;
+                li.appendChild(ingredientName);
+    
+                // Quantité et unité
+                if (ingredient.quantity || ingredient.unit) {
+                    const quantity = document.createElement('div');
+                    quantity.textContent = `${ingredient.quantity || ''} ${ingredient.unit || ''}`.trim();
+                    quantity.classList.add('ingredient-quantity');
+                    li.appendChild(quantity);
+                }
                 ingredientsElement.appendChild(li);
             });
-            recipeElement.appendChild(ingredientsElement);
-        
-            const descriptionElement = document.createElement('p');
-            descriptionElement.classList.add('recipe-description');
-            descriptionElement.textContent = `Description: ${recipe.description}`;
-            recipeElement.appendChild(descriptionElement);
-        
+            contentContainer.appendChild(ingredientsElement);
+    
+            recipeElement.appendChild(contentContainer);
             recipesDiv.appendChild(recipeElement);
-
-            return true;
+    
+            // Mise à jour du compteur de recettes
+            this.updateRecipeCount(recipes.length);
         });
     }    
-       
+
+    updateRecipeCount(count) {
+        const recipeCountElement = document.querySelector('.recipes_count');
+        recipeCountElement.textContent = `${count} Recettes`;
+    }    
 
     getUniqueTags(recipes, field) {
         const tags = new Set();
     
         recipes.forEach(recipe => {
             const fieldData = recipe[field];
-            
+
             if (Array.isArray(fieldData)) {
                 fieldData.forEach(item => {
                     if(field === 'ingredients'){
@@ -152,6 +186,29 @@ export default class RecipesFactory {
     renderTags(containerId, tags) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
+        
+        // Ajout du conteneur de la barre de recherche
+        const searchContainer = document.createElement('div');
+        searchContainer.classList.add('tag-search-container');
+        container.appendChild(searchContainer);
+        
+        // Ajout de la barre de recherche
+        const searchInput = document.createElement('input');
+        searchInput.type = "text";
+        searchInput.placeholder = "Recherche...";
+        searchInput.classList.add('tag-search');
+        searchInput.addEventListener('input', (event) => {
+            const query = event.target.value.trim().toLowerCase();
+            this.filterAndDisplayTags(containerId, query);
+        });
+        searchContainer.appendChild(searchInput);
+        
+        // Ajout de l'icône de recherche
+        const searchIcon = document.createElement('i');
+        searchIcon.classList.add('bi', 'bi-search', 'tag-search-icon');
+        searchContainer.appendChild(searchIcon);
+        
+        // Ajout des tags
         tags.forEach(tag => {
             const span = document.createElement('span');
             span.textContent = tag;
@@ -161,17 +218,56 @@ export default class RecipesFactory {
         });
     }    
     
+    filterAndDisplayTags(containerId, tagSearchQuery) {
+        const container = document.getElementById(containerId);
+        const mainSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
+
+        const allTags = this.getUniqueTags(this.recipes, this.getTypeFromContainerId(containerId));
+
+        const filteredTags = allTags.filter(tag => tag.toLowerCase().includes(tagSearchQuery));
+
+        const inputElement = container.querySelector('.tag-search');
+        const currentInputValue = inputElement.value;
+        const cursorPosition = inputElement.selectionStart;
+
+        this.renderTags(containerId, filteredTags);
+
+        const updatedInputElement = container.querySelector('.tag-search');
+        updatedInputElement.value = currentInputValue;
+        updatedInputElement.setSelectionRange(cursorPosition, cursorPosition);
+        updatedInputElement.focus();
+    }
+    
+    
+
+    getTypeFromContainerId(containerId) {
+        switch(containerId) {
+            case 'ingredient-tags-container': return 'ingredients';
+            case 'utensil-tags-container': return 'ustensils';
+            case 'appliance-tags-container': return 'appliance';
+            default: return '';
+        }
+    }      
+    
     selectTag(tag, containerId) {
         const selectedTagsContainer = document.getElementById('selected-tags-container');
-        const span = document.createElement('span');
-        span.textContent = tag;
-        span.classList.add('tag', 'selected-recipe-tag');
-        span.addEventListener('click', () => {
-            selectedTagsContainer.removeChild(span);
+        const tagSpan = document.createElement('span');
+        tagSpan.textContent = tag;
+        tagSpan.classList.add('tag', 'selected-recipe-tag');
+    
+        const closeIcon = document.createElement('img');
+        closeIcon.src = 'assets/img/cross.svg';
+        closeIcon.alt = 'Remove tag';
+        closeIcon.classList.add('close-icon');
+        closeIcon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            selectedTagsContainer.removeChild(tagSpan);
             const currentSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
             this.searchAndUpdate(currentSearchQuery);
         });
-        selectedTagsContainer.appendChild(span);
+    
+        tagSpan.appendChild(closeIcon);
+        selectedTagsContainer.appendChild(tagSpan);
         const currentSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
         this.searchAndUpdate(currentSearchQuery);
     }
@@ -194,5 +290,15 @@ export default class RecipesFactory {
             )
         );
     }
-    
+
+    initTagSearch() {
+        const tagInputs = document.querySelectorAll('.tag-search');
+        tagInputs.forEach(input => {
+            input.addEventListener('input', (event) => {
+                const query = event.target.value.trim().toLowerCase();
+                const containerId = event.target.parentNode.id;
+                this.filterAndDisplayTags(containerId, query);
+            });
+        });
+    }  
 }

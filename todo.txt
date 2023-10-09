@@ -1,0 +1,14 @@
+    searchRecipes(query) {
+        return this.recipes.filter(recipe => {
+            const lowerCaseName = recipe.name ? recipe.name.toLowerCase() : '';
+            const lowerCaseDescription = recipe.description ? recipe.description.toLowerCase() : '';
+
+            return (
+                lowerCaseName.includes(query) ||
+                lowerCaseDescription.includes(query) ||
+                (Array.isArray(recipe.ingredients) && recipe.ingredients.some(item => {
+                    return item.ingredient.toLowerCase().includes(query);
+                }))
+            );
+        });
+    }

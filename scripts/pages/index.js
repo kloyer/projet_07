@@ -20,8 +20,9 @@ function init() {
     searchbar.addEventListener('input', function () {
         const query = searchbar.value.trim().toLowerCase();
         recipeFactory.searchAndUpdate(query);
-    });    
+    });
+
+    recipeFactory.initTagSearch();
 }
 
 init();
-

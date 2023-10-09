@@ -15,7 +15,8 @@
 <body>
     <header>
         <div id="header__logo">
-            <img src="assets/img/logo.jpg" alt="Logo des petits plats">
+            <img src="assets/img/logo.svg" alt="Logo des petits plats">
+            <img src="assets/img/logo_end.svg">search_icon.svg
         </div>        
         <div id="header__main-content">
             <div class="header__title">
@@ -26,33 +27,40 @@
             <div id="header__search">
                 <div class="search-container">
                     <input id="searchbar" name="searchbar" type="text" placeholder="Rechercher une recette, un ingrédient, ...">
-                    <i id="searchicon" class="fa-solid fa-magnifying-glass"></i>
+                    <img id="searchicon" src="assets/img/search_icon.svg">
                 </div>
             </div>
         </div>
         
     </header>
-    <div id="filters">
-        <div class="dropdown" id="ingredient-tags">
-            <button class="dropbtn">Ingrédients <i class="bi bi-chevron-down"></i></button>
-            <div class="dropdown-content" id="ingredient-tags-container"></div>
+    <div id="content-wrapper">
+        <div id="filters">
+            <div class="dropdown" id="ingredient-tags">
+                <button class="dropbtn">Ingrédients <i class="bi bi-chevron-down"></i></button>
+                <div class="dropdown-content" id="ingredient-tags-container">
+                </div>
+            </div>
+        
+            <div class="dropdown" id="utensil-tags">
+                <button class="dropbtn">Ustensiles <i class="bi bi-chevron-down"></i></button>
+                <div class="dropdown-content" id="utensil-tags-container">
+                </div>
+            </div>
+        
+            <div class="dropdown" id="appliance-tags">
+                <button class="dropbtn">Appareils <i class="bi bi-chevron-down"></i></button>
+                <div class="dropdown-content" id="appliance-tags-container">
+                </div>
+            </div>
+
+            <span class="recipes_count">150 Recettes</span>
         </div>
-    
-        <div class="dropdown" id="utensil-tags">
-            <button class="dropbtn">Ustensiles <i class="bi bi-chevron-down"></i></button>
-            <div class="dropdown-content" id="utensil-tags-container"></div>
+        
+        <div id="selected-tags">
+            <div id="selected-tags-container"></div>
         </div>
-    
-        <div class="dropdown" id="appliance-tags">
-            <button class="dropbtn">Appareils <i class="bi bi-chevron-down"></i></button>
-            <div class="dropdown-content" id="appliance-tags-container"></div>
-        </div>
+        <main id="recipes"></main>
     </div>
-    
-    <div id="selected-tags">
-        <div id="selected-tags-container"></div>
-    </div>
-    <main id="recipes"></main>
     <p id="errorDiv"></p>
 </body>
 </html>

@@ -23,10 +23,10 @@ export default class RecipesFactory {
 
     searchRecipes(query) {
         const result = [];
-    
+
         for (let i = 0; i < this.recipes.length; i++) {
             const recipe = this.recipes[i];
-    
+
             const lowerCaseName = recipe.name ? recipe.name.toLowerCase() : '';
             const lowerCaseDescription = recipe.description ? recipe.description.toLowerCase() : '';
     
@@ -34,7 +34,7 @@ export default class RecipesFactory {
                 result.push(recipe);
                 continue;
             }
-    
+
             let ingredientMatch = false;
             if (Array.isArray(recipe.ingredients)) {
                 for (let j = 0; j < recipe.ingredients.length; j++) {

@@ -73,6 +73,14 @@ export default class RecipesFactory {
     displayRecipes(recipes) {
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
+
+        if (recipes.length === 0) {
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = "Aucune recette trouvée avec ces critères.";
+            errorMessage.classList.add('error-message');
+            recipesDiv.appendChild(errorMessage);
+            return;
+        }
         
         recipes.forEach(recipe => {
             const recipeElement = document.createElement('div');

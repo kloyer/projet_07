@@ -155,26 +155,26 @@ export default class RecipesFactory {
 
     getUniqueTags(recipes, field) {
         const tags = new Set();
-    
+        
         recipes.forEach(recipe => {
             const fieldData = recipe[field];
-
+    
             if (Array.isArray(fieldData)) {
                 fieldData.forEach(item => {
                     if(field === 'ingredients'){
-                        tags.add(item.ingredient);
+                        tags.add(item.ingredient.toLowerCase());
                     } else {
-                        tags.add(item);
+                        tags.add(item.toLowerCase());
                     }
                 });
             } else if (fieldData) {
-                tags.add(fieldData);
+                tags.add(fieldData.toLowerCase());
             }
         });
-    
+        
         console.log('getUniqueTags found tags:', Array.from(tags));
         return Array.from(tags);
-    }    
+    }  
 
     getExactMatchTags(recipes, field, query) {
         const tags = new Set();
@@ -275,6 +275,7 @@ export default class RecipesFactory {
     }      
     
     selectTag(tag, containerId) {
+        tag = tag.toLowerCase();
         const selectedTagsContainer = document.getElementById('selected-tags-container');
         const tagSpan = document.createElement('span');
         tagSpan.textContent = tag;

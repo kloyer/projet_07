@@ -1,8 +1,9 @@
 export default class RecipesFactory {
+    // Constructor to initialize the recipes array
     constructor() {
         this.recipes = [];
     }
-
+    // Create and return a new recipe object
     create({ id, image, name, servings, ingredients, time, description, appliance, ustensils }) {
         return {
             id,
@@ -16,43 +17,31 @@ export default class RecipesFactory {
             ustensils,
         };
     }
-
+    // Load recipes into the factory's array
     loadRecipes(rawData) {
         this.recipes = rawData.map(d => this.create(d));
     }
-
+    // Search recipes by name or description
     searchRecipes(query) {
-        const result = [];
-
-        for (let i = 0; i < this.recipes.length; i++) {
-            const recipe = this.recipes[i];
+        return this.recipes.filter(recipe => {
 
             const lowerCaseName = recipe.name ? recipe.name.toLowerCase() : '';
             const lowerCaseDescription = recipe.description ? recipe.description.toLowerCase() : '';
-    
+            
             if (lowerCaseName.includes(query) || lowerCaseDescription.includes(query)) {
-                result.push(recipe);
-                continue;
+                return true;
             }
 
-            let ingredientMatch = false;
             if (Array.isArray(recipe.ingredients)) {
-                for (let j = 0; j < recipe.ingredients.length; j++) {
-                    if (recipe.ingredients[j].ingredient.toLowerCase().includes(query)) {
-                        ingredientMatch = true;
-                        break;
-                    }
-                }
+                return recipe.ingredients.some(ingredient => 
+                    ingredient.ingredient.toLowerCase().includes(query)
+                );
             }
     
-            if (ingredientMatch) {
-                result.push(recipe);
-            }
-        }
-    
-        return result;
-    }    
-
+            return false;
+        });
+    }  
+    // Search for recipes based on query and update the UI
     searchAndUpdate(query) {
         const selectedTagsContainer = document.getElementById('selected-tags-container');
         const selectedTags = Array.from(selectedTagsContainer.children).map(span => span.textContent);
@@ -66,17 +55,17 @@ export default class RecipesFactory {
             filteredRecipes = this.searchRecipesWithTags(this.recipes, selectedTags);
         }
         
-        this.displayRecipes(filteredRecipes);
+        this.displayRecipes(filteredRecipes, query);
         this.displayTags(filteredRecipes);
     }    
-
-    displayRecipes(recipes) {
+    // Display the recipes on the UI
+    displayRecipes(recipes, query) {
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
 
         if (recipes.length === 0) {
             const errorMessage = document.createElement('p');
-            errorMessage.textContent = "Aucune recette trouvée avec ces critères.";
+            errorMessage.textContent = `Aucune recette ne contient ${query} vous pouvez chercher «tarte aux pommes », « poisson », etc.`;
             errorMessage.classList.add('error-message');
             recipesDiv.appendChild(errorMessage);
             return;
@@ -147,12 +136,12 @@ export default class RecipesFactory {
             this.updateRecipeCount(recipes.length);
         });
     }    
-
+    // Update the number of recipes displayed
     updateRecipeCount(count) {
         const recipeCountElement = document.querySelector('.recipes_count');
         recipeCountElement.textContent = `${count} Recettes`;
     }    
-
+    // Get unique tags from recipes
     getUniqueTags(recipes, field) {
         const tags = new Set();
         
@@ -171,11 +160,10 @@ export default class RecipesFactory {
                 tags.add(fieldData.toLowerCase());
             }
         });
-        
-        console.log('getUniqueTags found tags:', Array.from(tags));
+
         return Array.from(tags);
     }  
-
+    // Get exact match tags from recipes
     getExactMatchTags(recipes, field, query) {
         const tags = new Set();
         recipes.forEach(recipe => {
@@ -192,10 +180,8 @@ export default class RecipesFactory {
         });
         return Array.from(tags);
     }
-    
+    // Display tags in the UI
     displayTags(recipes) {
-        console.log('displayTags called with recipes:', recipes);
-        
         const selectedTagsContainer = document.getElementById('selected-tags-container');
         const selectedTags = Array.from(selectedTagsContainer.children).map(span => span.textContent);
     
@@ -207,17 +193,15 @@ export default class RecipesFactory {
         this.renderTags('utensil-tags-container', ustensilTags);
         this.renderTags('appliance-tags-container', applianceTags);
     }    
-
+    // Render tag elements
     renderTags(containerId, tags) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
-        
-        // Ajout du conteneur de la barre de recherche
+
         const searchContainer = document.createElement('div');
         searchContainer.classList.add('tag-search-container');
         container.appendChild(searchContainer);
-        
-        // Ajout de la barre de recherche
+
         const searchInput = document.createElement('input');
         searchInput.type = "text";
         searchInput.placeholder = "Recherche...";
@@ -227,13 +211,11 @@ export default class RecipesFactory {
             this.filterAndDisplayTags(containerId, query);
         });
         searchContainer.appendChild(searchInput);
-        
-        // Ajout de l'icône de recherche
+
         const searchIcon = document.createElement('i');
         searchIcon.classList.add('bi', 'bi-search', 'tag-search-icon');
         searchContainer.appendChild(searchIcon);
-        
-        // Ajout des tags
+
         tags.forEach(tag => {
             const span = document.createElement('span');
             span.textContent = tag;
@@ -242,7 +224,7 @@ export default class RecipesFactory {
             container.appendChild(span);
         });
     }    
-    
+    // Filter and display tags based on search
     filterAndDisplayTags(containerId, tagSearchQuery) {
         const container = document.getElementById(containerId);
         const mainSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
@@ -262,9 +244,7 @@ export default class RecipesFactory {
         updatedInputElement.setSelectionRange(cursorPosition, cursorPosition);
         updatedInputElement.focus();
     }
-    
-    
-
+    // Get the type based on container ID
     getTypeFromContainerId(containerId) {
         switch(containerId) {
             case 'ingredient-tags-container': return 'ingredients';
@@ -273,7 +253,7 @@ export default class RecipesFactory {
             default: return '';
         }
     }      
-    
+    // Add a selected tag to the UI
     selectTag(tag, containerId) {
         tag = tag.toLowerCase();
         const selectedTagsContainer = document.getElementById('selected-tags-container');
@@ -297,7 +277,7 @@ export default class RecipesFactory {
         const currentSearchQuery = document.getElementById('searchbar').value.trim().toLowerCase();
         this.searchAndUpdate(currentSearchQuery);
     }
-    
+    // Search recipes with selected tags
     searchRecipesWithSelectedTags() {
         const selectedTagsContainer = document.getElementById('selected-tags-container');
         const selectedTags = Array.from(selectedTagsContainer.children).map(span => span.textContent);
@@ -306,7 +286,7 @@ export default class RecipesFactory {
         this.displayRecipes(filteredRecipes); 
         this.displayTags(filteredRecipes); 
     }
-
+    // Filter recipes based on provided tags
     searchRecipesWithTags(recipes, tags) {
         return recipes.filter(recipe => 
             tags.every(tag => 
@@ -316,7 +296,7 @@ export default class RecipesFactory {
             )
         );
     }
-
+    // Initialize the tag search functionality
     initTagSearch() {
         const tagInputs = document.querySelectorAll('.tag-search');
         tagInputs.forEach(input => {

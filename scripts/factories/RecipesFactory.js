@@ -22,19 +22,25 @@ export default class RecipesFactory {
     }
 
     searchRecipes(query) {
-        return this.recipes.filter(recipe => {
+        const results = [];
+        for (let i = 0; i < this.recipes.length; i++) {
+            const recipe = this.recipes[i];
             const lowerCaseName = recipe.name ? recipe.name.toLowerCase() : '';
             const lowerCaseDescription = recipe.description ? recipe.description.toLowerCase() : '';
     
-            return (
-                lowerCaseName.includes(query) ||
-                lowerCaseDescription.includes(query) ||
-                (Array.isArray(recipe.ingredients) && recipe.ingredients.some(item => {
-                    return item.ingredient.toLowerCase().includes(query);
-                }))
-            );
-        });
+            const isInName = lowerCaseName.includes(query);
+            const isInDescription = lowerCaseDescription.includes(query);
+            const isInIngredients = Array.isArray(recipe.ingredients) && recipe.ingredients.some(item => {
+                return item.ingredient.toLowerCase().includes(query);
+            });
+    
+            if (isInName || isInDescription || isInIngredients) {
+                results.push(recipe);
+            }
+        }
+        return results;
     }
+    
 
     searchAndUpdate(query) {
         const selectedTagsContainer = document.getElementById('selected-tags-container');

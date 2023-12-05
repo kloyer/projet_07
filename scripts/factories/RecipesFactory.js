@@ -62,45 +62,15 @@ export default class RecipesFactory {
     displayRecipes(recipes) {
         const recipesDiv = document.getElementById('recipes');
         recipesDiv.innerHTML = '';
-        
+
         recipes.forEach(recipe => {
             const recipeElement = document.createElement('div');
-            recipeElement.classList.add('recipe-item');
-        
-            const imageElement = document.createElement('img');
-            imageElement.src = `assets/recipes/${recipe.image}`;
-            imageElement.alt = `Image de ${recipe.name}`;
-            imageElement.classList.add('recipe-image');
-            recipeElement.appendChild(imageElement);
-        
-            // Conteneur pour le contenu sous l'image
-            const contentContainer = document.createElement('div');
-            contentContainer.classList.add('recipe-content');
-            
+
             const nameElement = document.createElement('h3');
             nameElement.textContent = recipe.name;
-            nameElement.classList.add('recipe-title');
-            contentContainer.appendChild(nameElement);
-    
-            // Sous-titre "Recette"
-            const recipeSubtitle = document.createElement('h4');
-            recipeSubtitle.textContent = "Recette";
-            recipeSubtitle.classList.add('recipe-subtitle');
-            contentContainer.appendChild(recipeSubtitle);
-    
-            const descriptionElement = document.createElement('p');
-            descriptionElement.classList.add('recipe-description');
-            descriptionElement.textContent = recipe.description;
-            contentContainer.appendChild(descriptionElement);
-    
-            // Sous-titre "Ingrédient"
-            const ingredientSubtitle = document.createElement('h4');
-            ingredientSubtitle.textContent = "Ingrédients";
-            ingredientSubtitle.classList.add('ingredient-subtitle');
-            contentContainer.appendChild(ingredientSubtitle);
-    
+            recipeElement.appendChild(nameElement);
+
             const ingredientsElement = document.createElement('ul');
-            ingredientsElement.classList.add('ingredients-list');
             recipe.ingredients.forEach(ingredient => {
                 const li = document.createElement('li');
                 li.classList.add('ingredient-item');
@@ -119,20 +89,15 @@ export default class RecipesFactory {
                 }
                 ingredientsElement.appendChild(li);
             });
-            contentContainer.appendChild(ingredientsElement);
-    
-            recipeElement.appendChild(contentContainer);
-            recipesDiv.appendChild(recipeElement);
-    
-            // Mise à jour du compteur de recettes
-            this.updateRecipeCount(recipes.length);
-        });
-    }    
+            recipeElement.appendChild(ingredientsElement);
 
-    updateRecipeCount(count) {
-        const recipeCountElement = document.querySelector('.recipes_count');
-        recipeCountElement.textContent = `${count} Recettes`;
-    }    
+            const descriptionElement = document.createElement('p');
+            descriptionElement.textContent = `Description: ${recipe.description}`;
+            recipeElement.appendChild(descriptionElement);
+
+            recipesDiv.appendChild(recipeElement);
+        });
+    }
 
     getUniqueTags(recipes, field) {
         const tags = new Set();
